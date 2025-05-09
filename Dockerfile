@@ -1,0 +1,19 @@
+
+FROM --platform=linux/amd64 node:20-alpine AS build
+
+LABEL maintainer="Umpa Lumpa <dik@duk.com>"
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+FROM --platform=linux/amd64 nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
